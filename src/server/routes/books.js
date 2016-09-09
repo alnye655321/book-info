@@ -30,6 +30,39 @@ router.get('/:id', (req, res, next) => {
     });
 });
 
+// http POST localhost:3000/api/v1/books/ title=Alex genre=Nye cover=nothing description=horrid last_name=Nye
+router.post('/', (req, res, next) => {
+  const newBook = {
+    title: req.body.title,
+    genre: req.body.genre,
+    cover: req.body.cover,
+    description: req.body.description,
+    last_name: req.body.last_name
+  };
+  //--------------
+  db.any(`INSERT INTO books (title, genre, cover, description) VALUES('${newBook.title}', '${newBook.genre}', '${newBook.cover}', '${newBook.description}')`)
+  .then((result) => {
+    //res.send('You added a book!');
+  })
+  .catch((error) => {
+    next(error);
+  });
+  //-----------------
+  db.task(t=> {
+      return t.one("SELECT id FROM authors WHERE last_name = $1", newBook.last_name)
+          .then(author => {
+              return t.any('INSERT INTO books_authors (author_id, book_id) VALUES ($1,(SELECT MAX(id) FROM books))', author.id);
+            });
+    })
+      .then(events=> {
+          // success
+          res.send('You added a book!');
+        })
+      .catch(error=> {
+          // error
+          next(error);
+        });
+});
 
 //http --json PUT http://localhost:3000/api/v1/books/7 title=Alec
 router.put('/:id', function (req, res, next) {
@@ -40,7 +73,6 @@ router.put('/:id', function (req, res, next) {
     cover: req.body.cover,
     description: req.body.description
   };
-
 
   if (updateBook.title) {
     db.any(`UPDATE books SET title = '${updateBook.title}' WHERE id = ${bookID}`, [true])
@@ -86,12 +118,11 @@ router.put('/:id', function (req, res, next) {
 
 router.delete('/:id', function (req, res, next) {
   const bookID = parseInt(req.params.id);
-
- db.any(`DELETE FROM books WHERE id = ${bookID}`, [true])
+  db.any(`DELETE FROM books WHERE id = ${bookID}`, [true])
    .then(function (data) {
-     console.log(data);
-     res.send(data);
-   })
+        console.log(data);
+        res.send(data);
+      })
    .catch(function (error) {
     next(error);
   });

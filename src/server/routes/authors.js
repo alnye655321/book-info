@@ -89,7 +89,6 @@ router.put('/:id', function (req, res, next) {
     portrait: req.body.portrait
   };
 
-
   if (updateAuthor.first_name) {
     db.any(`UPDATE authors SET first_name = '${updateAuthor.first_name}' WHERE id = ${authorID}`, [true])
       .then(function (data) {
@@ -135,11 +134,11 @@ router.put('/:id', function (req, res, next) {
 router.delete('/:id', function (req, res, next) {
   const authorID = parseInt(req.params.id);
 
- db.any(`DELETE FROM authors WHERE id = ${authorID}`, [true])
+  db.any(`DELETE FROM authors WHERE id = ${authorID}`, [true])
    .then(function (data) {
-     console.log(data);
-     res.send(data);
-   })
+    console.log(data);
+    res.send(data);
+  })
    .catch(function (error) {
     next(error);
   });
