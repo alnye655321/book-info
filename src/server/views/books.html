@@ -1,0 +1,36 @@
+{% extends "_base.html" %}
+
+{% block title %}{% endblock %}
+
+{% block content %}
+
+  <div class="container">
+    <h1>Books </h1>
+
+    {% for book in books %}
+    <div class="row">
+      <div class="col-sm-4"><a href="#" class=""><img src="{{book.cover}}" class="img-responsive"></a>
+      </div>
+      <div class="col-sm-8">
+        <h3 class="title">{{book.title}}</h3>
+        <p><span class="glyphicon glyphicon-info-sign"></span> Description</p>
+        <p>{{book.description}}</p>
+        <br>
+        <p><span class="glyphicon glyphicon-film"></span> Genre</p>
+        <p>{{book.genre}}</p>
+        <br>
+        <p><span class="glyphicon glyphicon-pencil"></span> Author(s)</p>
+            {% for join in joins %}
+              {% if book.id == join.book_id %}
+                <a href="#">{{join.first_name}} , {{join.last_name}}</a></p>
+              {% endif %}
+            {% endfor %}
+
+      </div>
+    </div>
+    <hr>
+    {% endfor %}
+
+  </div>
+
+{% endblock %}

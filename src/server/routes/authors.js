@@ -3,9 +3,20 @@ const router = express.Router();
 const db = require('../db/connection');
 
 router.get('/', (req, res, next) => {
+  const renderObject = {};
   db.any('SELECT * FROM authors')
-  .then((result) => {
-    res.send(result);
+  .then((results) => {
+    renderObject.authors = results;
+    //res.render('authors.html', renderObject);
+  })
+  .catch((error) => {
+    next(error);
+  });
+
+  db.any('SELECT * from books JOIN books_authors on books.id = books_authors.book_id')
+  .then((results) => {
+    renderObject.joins = results;
+    res.render('authors.html', renderObject);
   })
   .catch((error) => {
     next(error);
@@ -14,7 +25,7 @@ router.get('/', (req, res, next) => {
 
 router.get('/new', (req, res, next) => {
   res.render('newauthor.html');
-  
+
 });
 
 router.get('/:id', (req, res, next) => {
@@ -51,41 +62,8 @@ router.post('/', (req, res, next) => {
   });
 });
 
-// http PUT localhost:3000/api/v1/authors/8 first_name=AlexCh last_name=NyeCh biography=nothingCh portrait=horridCh
-// router.put('/:id', (req, res, next) => {
-//   const authorID = parseInt(req.params.id);
-//   const updateAuthor = {
-//     first_name: req.body.first_name,
-//     last_name: req.body.last_name,
-//     biography: req.body.biography,
-//     portrait: req.body.portrait
-//   };
-//
-//   db.tx(t=> {
-//           return t.batch([
-//               t.any(`UPDATE authors SET first_name = ${updateAuthor.first_name} WHERE id = ${authorID} returning id`),
-//               t.any(`UPDATE authors SET last_name = ${updateAuthor.last_name} WHERE id = ${authorID} returning id`),
-//               t.any(`UPDATE authors SET biography = ${updateAuthor.biography} WHERE id = ${authorID} returning id`),
-//               t.any(`UPDATE authors SET portrait = ${updateAuthor.portrait} WHERE id = ${authorID} returning id`)
-//           ]);
-//       })
-//       .then(result=> {
-//         if (!result.length) {
-//           res.status(404).send({
-//             status: 'error',
-//             message: 'That author doesn\'t exist'
-//           });
-//         } else {
-//           res.send('You updated an author!');
-//         }
-//       })
-//       .catch((error) => {
-//         next(error);
-//       });
-//     });
-
-//http --json PUT http://localhost:3000/api/v1/authors/7 first_name=Alec
-router.put('/:id', function (req, res, next) {
+// http PUT localhost:3000/api/v1/authors/10 first_name=AlexCh last_name=NyeCh biography=nothingCh portrait=horridCh
+router.put('/:id', (req, res, next) => {
   const authorID = parseInt(req.params.id);
   const updateAuthor = {
     first_name: req.body.first_name,
@@ -94,47 +72,28 @@ router.put('/:id', function (req, res, next) {
     portrait: req.body.portrait
   };
 
-  if (updateAuthor.first_name) {
-    db.any(`UPDATE authors SET first_name = '${updateAuthor.first_name}' WHERE id = ${authorID}`, [true])
-      .then(function (data) {
-        res.send(data);
+  db.tx(t=> {
+          return t.batch([
+              t.any(`UPDATE authors SET first_name = '${updateAuthor.first_name}' WHERE id = ${authorID}`, [true]),
+              t.any(`UPDATE authors SET last_name = '${updateAuthor.last_name}' WHERE id = ${authorID}`, [true]),
+              t.any(`UPDATE authors SET biography = '${updateAuthor.biography}' WHERE id = ${authorID}`, [true]),
+              t.any(`UPDATE authors SET portrait = '${updateAuthor.portrait}' WHERE id = ${authorID}`, [true])
+          ]);
       })
-      .catch(function (error) {
+      .then(result=> {
+        if (!result.length) {
+          res.status(404).send({
+            status: 'error',
+            message: 'That author doesn\'t exist'
+          });
+        } else {
+          res.send('You updated an author!');
+        }
+      })
+      .catch((error) => {
         next(error);
       });
-  }
-
-  if (updateAuthor.last_name) {
-    db.any(`UPDATE authors SET last_name = '${updateAuthor.last_name}' WHERE id = ${authorID}`, [true])
-      .then(function (data) {
-        res.send(data);
-      })
-      .catch(function (error) {
-        next(error);
-      });
-  }
-
-  if (updateAuthor.biography) {
-    db.any(`UPDATE authors SET biography = '${updateAuthor.biography}' WHERE id = ${authorID}`, [true])
-      .then(function (data) {
-        res.send(data);
-      })
-      .catch(function (error) {
-        next(error);
-      });
-  }
-
-  if (updateAuthor.portrait) {
-    db.any(`UPDATE authors SET portrait = '${updateAuthor.portrait}' WHERE id = ${authorID}`, [true])
-      .then(function (data) {
-        res.send(data);
-      })
-      .catch(function (error) {
-        next(error);
-      });
-  }
-
-});
+    });
 
 router.delete('/:id', function (req, res, next) {
   const authorID = parseInt(req.params.id);

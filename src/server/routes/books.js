@@ -3,9 +3,20 @@ const router = express.Router();
 const db = require('../db/connection');
 
 router.get('/', (req, res, next) => {
+  const renderObject = {};
   db.any('SELECT * FROM books')
-  .then((result) => {
-    res.send(result);
+  .then((results) => {
+    renderObject.books = results;
+    //res.render('books.html', renderObject);
+  })
+  .catch((error) => {
+    next(error);
+  });
+
+  db.any('SELECT * from authors JOIN books_authors on authors.id = books_authors.author_id')
+  .then((results) => {
+    renderObject.joins = results;
+    res.render('books.html', renderObject);
   })
   .catch((error) => {
     next(error);
@@ -76,8 +87,8 @@ router.post('/', (req, res, next) => {
         });
 });
 
-//http --json PUT http://localhost:3000/api/v1/books/7 title=Alec
-router.put('/:id', function (req, res, next) {
+//http --json PUT http://localhost:3000/api/v1/books/21 title=Alec genre=somethinCool cover=somethinCool description=notWorthit
+router.put('/:id', (req, res, next) => {
   const bookID = parseInt(req.params.id);
   const updateBook = {
     title: req.body.title,
@@ -86,47 +97,28 @@ router.put('/:id', function (req, res, next) {
     description: req.body.description
   };
 
-  if (updateBook.title) {
-    db.any(`UPDATE books SET title = '${updateBook.title}' WHERE id = ${bookID}`, [true])
-      .then(function (data) {
-        res.send(data);
+  db.tx(t=> {
+          return t.batch([
+              t.any(`UPDATE books SET title = '${updateBook.title}' WHERE id = ${bookID}`, [true]),
+              t.any(`UPDATE books SET genre = '${updateBook.genre}' WHERE id = ${bookID}`, [true]),
+              t.any(`UPDATE books SET cover = '${updateBook.cover}' WHERE id = ${bookID}`, [true]),
+              t.any(`UPDATE books SET description = '${updateBook.description}' WHERE id = ${bookID}`, [true])
+          ]);
       })
-      .catch(function (error) {
+      .then(result=> {
+        if (!result.length) {
+          res.status(404).send({
+            status: 'error',
+            message: 'That book doesn\'t exist'
+          });
+        } else {
+          res.send('You updated a book!');
+        }
+      })
+      .catch((error) => {
         next(error);
       });
-  }
-
-  if (updateBook.genre) {
-    db.any(`UPDATE books SET genre = '${updateBook.genre}' WHERE id = ${bookID}`, [true])
-      .then(function (data) {
-        res.send(data);
-      })
-      .catch(function (error) {
-        next(error);
-      });
-  }
-
-  if (updateBook.cover) {
-    db.any(`UPDATE books SET cover = '${updateBook.cover}' WHERE id = ${bookID}`, [true])
-      .then(function (data) {
-        res.send(data);
-      })
-      .catch(function (error) {
-        next(error);
-      });
-  }
-
-  if (updateBook.description) {
-    db.any(`UPDATE books SET description = '${updateBook.description}' WHERE id = ${bookID}`, [true])
-      .then(function (data) {
-        res.send(data);
-      })
-      .catch(function (error) {
-        next(error);
-      });
-  }
-
-});
+    });
 
 router.delete('/:id', function (req, res, next) {
   const bookID = parseInt(req.params.id);
