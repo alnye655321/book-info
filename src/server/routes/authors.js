@@ -14,6 +14,7 @@ router.get('/', (req, res, next) => {
 
 router.get('/new', (req, res, next) => {
   res.render('newauthor.html');
+  
 });
 
 router.get('/:id', (req, res, next) => {

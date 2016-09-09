@@ -12,6 +12,18 @@ router.get('/', (req, res, next) => {
   });
 });
 
+router.get('/new', (req, res, next) => {
+  db.any('SELECT last_name, first_name FROM authors')
+  .then((results) => {
+    const renderObject = {};
+    renderObject.author = results;
+    res.render('newbook.html', renderObject);
+  })
+  .catch((error) => {
+    next(error);
+  });
+});
+
 router.get('/:id', (req, res, next) => {
   const booksID = parseInt(req.params.id);
   db.any(`SELECT * FROM books WHERE id = ${booksID}`)
