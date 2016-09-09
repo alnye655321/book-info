@@ -1,7 +1,7 @@
-DROP DATABASE IF EXISTS galvanize_reads;
-CREATE DATABASE galvanize_reads;
+DROP DATABASE IF EXISTS test1;
+CREATE DATABASE test1;
 
-\c galvanize_reads;
+\c test1;
 
 CREATE TABLE books (
  ID SERIAL PRIMARY KEY,
