@@ -49,7 +49,7 @@ router.post('/', (req, res, next) => {
   });
   //-----------------
   db.task(t=> {
-      return t.one("SELECT id FROM authors WHERE last_name = $1", newBook.last_name)
+      return t.one('SELECT id FROM authors WHERE last_name = $1', newBook.last_name)
           .then(author => {
               return t.any('INSERT INTO books_authors (author_id, book_id) VALUES ($1,(SELECT MAX(id) FROM books))', author.id);
             });
