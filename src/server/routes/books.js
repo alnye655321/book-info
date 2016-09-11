@@ -4,6 +4,7 @@ const db = require('../db/connection');
 
 router.get('/', (req, res, next) => {
   const renderObject = {};
+  renderObject.title = 'Books';
   db.any('SELECT * FROM books')
   .then((results) => {
     renderObject.books = results;
