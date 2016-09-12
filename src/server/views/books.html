@@ -44,7 +44,8 @@
                 <a href="#">{{join.first_name}} , {{join.last_name}}</a></p>
               {% endif %}
             {% endfor %}
-<button type="button" class="btn btn-primary btn-sm update-book-btn" data-toggle="modal" data-target="#myModal" data-id="{{book.id}}" data-description="{{book.description}}" data-cover="{{book.cover}}" data-genre="{{book.genre}}" data-title="{{book.title}}">Update</button>
+        <button class="btn btn-sm btn-danger delete-book-btn" data-id="{{book.id}}">Delete</button>
+        <button type="button" class="btn btn-primary btn-sm update-book-btn" data-toggle="modal" data-target="#myModal" data-id="{{book.id}}" data-description="{{book.description}}" data-cover="{{book.cover}}" data-genre="{{book.genre}}" data-title="{{book.title}}">Update</button>
       </div>
     </div>
     <hr>
