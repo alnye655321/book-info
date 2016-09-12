@@ -54,6 +54,26 @@ router.get('/:id', (req, res, next) => {
     });
 });
 
+router.post('/searchTitle', (req, res, next) => {
+  const searchTitle = req.body.searchTitle
+  db.any(`SELECT * FROM books WHERE title like '%$1#%'`, searchTitle)
+    .then((results) => {
+      if (results.length) {
+        const renderObject = {};
+        renderObject.books = results;
+        res.render('books.html', renderObject);
+      } else {
+        res.status(404).send({
+          status: 'error',
+          message: 'That book doesn\'t exist'
+        });
+      }
+    })
+    .catch((error) => {
+      next(error);
+    });
+});
+
 // http POST localhost:3000/api/v1/books/ title=Alex genre=Nye cover=nothing description=horrid last_name=Nye
 router.post('/', (req, res, next) => {
   const newBook = {
@@ -72,7 +92,7 @@ router.post('/', (req, res, next) => {
     next(error);
   });
   //-----------------
-  db.task(t=> {
+  db.task(t=> { //add new record to join table after book addition
       return t.one('SELECT id FROM authors WHERE last_name = $1', newBook.last_name)
           .then(author => {
               return t.any('INSERT INTO books_authors (author_id, book_id) VALUES ($1,(SELECT MAX(id) FROM books))', author.id);

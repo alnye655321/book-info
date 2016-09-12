@@ -21,9 +21,7 @@ $(document).ready(function(){
 
 });
 
-$( "#filter" ).on( "click", function() {
-  $( "#filterForm" ).toggle();
-});
+
 
 //fill book update modal form
 $(document).on('click', '.update-book-btn', function() {

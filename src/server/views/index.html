@@ -5,8 +5,23 @@
 {% block content %}
 
   <div class="container">
-    <h1>{{title}}</h1>
-    <h2>The sum is {{sum}}</h2>
+    <h1>Galvanize Reads</h1>
+
+    <div class="row">
+      <div class="col-lg-12">
+        <p>
+          <a href="/api/v1/books/" class="btn btn-sq-lg btn-primary">
+              <i class="fa fa-book fa-5x"></i><br/>
+              Books
+          </a>
+          <a href="/api/v1/authors/" class="btn btn-sq-lg btn-success">
+            <i class="fa fa-user fa-5x"></i><br/>
+            Authors
+          </a>
+        </p>
+      </div>
+</div>
+
   </div>
 
 {% endblock %}

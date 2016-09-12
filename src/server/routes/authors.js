@@ -46,6 +46,27 @@ router.get('/:id', (req, res, next) => {
       next(error);
     });
 });
+
+router.post('/searchAuthor', (req, res, next) => {
+  const searchAuthor = req.body.searchAuthor;
+  db.any(`SELECT * FROM authors WHERE first_name LIKE '%$1#%' OR last_name LIKE '%$1#%'`, searchAuthor)
+    .then((results) => {
+      if (results.length) {
+        const renderObject = {};
+        renderObject.authors = results;
+        res.render('authors.html', renderObject);
+      } else {
+        res.status(404).send({
+          status: 'error',
+          message: 'That author doesn\'t exist'
+        });
+      }
+    })
+    .catch((error) => {
+      next(error);
+    });
+});
+
 // http POST localhost:3000/api/v1/authors/ first_name=Alex last_name=Nye biography=nothing portrait=horrid
 router.post('/', (req, res, next) => {
   const newAuthor = {
