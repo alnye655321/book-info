@@ -11,6 +11,11 @@ router.get('/', (req, res, next) => {
   db.any('SELECT * FROM authors')
   .then((results) => {
     renderObject.authors = results;
+    res.status(200).send({
+      status: 'success',
+      data: renderObject;
+    });
+    //renderObject.authors = results;
     //res.render('authors.html', renderObject);
   })
   .catch((error) => {
