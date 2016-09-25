@@ -11,7 +11,8 @@ router.get('/', (req, res, next) => {
   db.any('SELECT * FROM authors')
   .then((results) => {
     renderObject.authors = results;
-    res.render('authors.html', renderObject);
+    //res.render('authors.html', renderObject);
+    res.json(renderObject).status(200);
   })
   .catch((error) => {
     next(error);
