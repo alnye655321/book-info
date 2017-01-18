@@ -17,7 +17,7 @@
   ];
 
   // *** load environment variables *** //
-  require('dotenv').config();
+  //require('dotenv').config();
 
   appConfig.init = function(app, express) {
 
@@ -29,9 +29,9 @@
     app.set('view engine', 'html');
 
     // *** app middleware *** //
-    if (process.env.NODE_ENV !== 'test') {
-      app.use(morgan('dev'));
-    }
+    // if (process.env.NODE_ENV !== 'test') {
+    //   app.use(morgan('dev'));
+    // }
     app.use(cookieParser());
     app.use(bodyParser.json());
     app.use(bodyParser.urlencoded({ extended: false }));
