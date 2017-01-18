@@ -3,16 +3,12 @@ const router = express.Router();
 const db = require('../db/connection');
 
 router.get('/', (req, res, next) => {
-  res.header('Access-Control-Allow-Origin', '*');
-  res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE');
-  res.header('Access-Control-Allow-Headers', 'Content-Type');
   const renderObject = {};
   renderObject.title = 'Authors';
   db.any('SELECT * FROM authors')
   .then((results) => {
     renderObject.authors = results;
-    //res.render('authors.html', renderObject);
-    res.json(renderObject).status(200);
+    res.render('authors.html', renderObject);
   })
   .catch((error) => {
     next(error);
